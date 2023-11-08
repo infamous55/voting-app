@@ -17,6 +17,8 @@ engine = create_engine(database_url)
 
 
 Base = declarative_base()
+base = Base()
+base_metadata = base.metadata
 
 
 def init_db():
@@ -24,4 +26,3 @@ def init_db():
 
 
 Session = sessionmaker(bind=engine)
-session = Session()
