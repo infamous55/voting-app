@@ -28,17 +28,12 @@ async def get_polls(current_user: User = Depends(get_current_user)):
         for poll in user_polls:
             options_response: list[OptionResponse] = []
             for option in poll.options:
-                vote_count: int = (
-                    session.query(func.count(Vote.id))
-                    .filter(Vote.option_id == option.id)
-                    .scalar()
-                )
                 options_response.append(
                     OptionResponse(
                         id=cast(int, option.id),
                         title=cast(str, option.title),
                         description=cast(str, option.description),
-                        votes_count=vote_count,
+                        votes_count=cast(int, option.votes_count),
                     )
                 )
             polls_response.append(
@@ -62,17 +57,12 @@ async def get_poll(poll_id: int):
         options: list[Option] = session.query(Option).filter_by(poll_id=poll_id).all()
         options_response = []
         for option in options:
-            vote_count: int = (
-                session.query(func.count(Vote.id))
-                .filter(Vote.option_id == option.id)
-                .scalar()
-            )
             options_response.append(
                 OptionResponse(
                     id=cast(int, option.id),
                     title=cast(str, option.title),
                     description=cast(str, option.description),
-                    votes_count=vote_count,
+                    votes_count=cast(int, option.votes_count),
                 )
             )
         return PollResponse(
@@ -98,7 +88,10 @@ async def create_poll(
         options_response: list[OptionResponse] = []
         for option in poll.options:
             new_option = Option(
-                title=option.title, description=option.description, poll_id=new_poll.id
+                title=option.title,
+                description=option.description,
+                poll_id=new_poll.id,
+                votes_count=0,
             )
             session.add(new_option)
             session.commit()

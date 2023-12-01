@@ -38,6 +38,7 @@ class Option(Base):
     poll_id = Column(Integer, ForeignKey("polls.id"))
     poll = relationship("Poll", back_populates="options")
     votes = relationship("Vote", back_populates="option", cascade="all, delete-orphan")
+    votes_count = Column(Integer, nullable=False, default=0)
 
 
 class Vote(Base):

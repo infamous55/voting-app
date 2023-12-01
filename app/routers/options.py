@@ -20,17 +20,12 @@ async def get_options(poll_id: int):
         options: list[Option] = session.query(Option).filter_by(poll_id=poll_id).all()
         options_response: list[OptionResponse] = []
         for option in options:
-            vote_count: int = (
-                session.query(func.count(Vote.id))
-                .filter(Vote.option_id == option.id)
-                .scalar()
-            )
             options_response.append(
                 OptionResponse(
                     id=cast(int, option.id),
                     title=cast(str, option.title),
                     description=cast(str, option.description),
-                    votes_count=vote_count,
+                    votes_count=cast(int, option.votes_count),
                 )
             )
         return options_response
@@ -45,16 +40,11 @@ async def get_option(poll_id: int, option_id: int):
         poll: Poll | None = session.query(Poll).filter_by(id=poll_id).first()
         if not poll:
             raise HTTPException(status_code=404, detail="Poll not found")
-        vote_count: int = (
-            session.query(func.count(Vote.id))
-            .filter(Vote.option_id == option.id)
-            .scalar()
-        )
         return OptionResponse(
             id=cast(int, option.id),
             title=cast(str, option.title),
             description=cast(str, option.description),
-            votes_count=vote_count,
+            votes_count=cast(int, option.votes_count),
         )
 
 
@@ -77,7 +67,10 @@ async def create_option(
                 status_code=403, detail="You are not authorized to create an option"
             )
         new_option = Option(
-            title=option.title, description=option.description, poll_id=poll_id
+            title=option.title,
+            description=option.description,
+            poll_id=poll_id,
+            votes_count=0,
         )
         session.add(new_option)
         session.commit()
