@@ -43,6 +43,11 @@ class PollResponse(BaseModel):
     user_id: int
     options: list[OptionResponse]
 
+class VoteResponse(BaseModel):
+    id: int
+    user_id: int
+    poll_id: int
+    option_id: int
 
 class OptionCreateInput(BaseModel):
     title: str
