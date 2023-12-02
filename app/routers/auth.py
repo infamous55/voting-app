@@ -7,13 +7,19 @@ from jose import jwt
 from app.config import settings
 from app.db import Session
 from app.dependencies import pwd_context
-from app.models import Credentials, NewUser
+from app.models import Credentials, LoginResponse, NewUser
 from app.schemas import User
 
 router = APIRouter()
 
 
-@router.post("/register", status_code=201)
+@router.post(
+    "/register",
+    status_code=status.HTTP_201_CREATED,
+    response_model=LoginResponse,
+    summary="Register new user",
+    tags=["auth"],
+)
 async def register(new_user: NewUser):
     with Session() as session:
         hashed_password = pwd_context.hash(new_user.password)
@@ -22,7 +28,10 @@ async def register(new_user: NewUser):
         )
         session.add(user)
         session.commit()
-        return {"message": "User registered successfully"}
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=timedelta(days=1)
+        )
+        return LoginResponse(access_token=access_token)
 
 
 def create_access_token(data: dict, expires_delta: timedelta):
@@ -33,7 +42,13 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-@router.post("/login")
+@router.post(
+    "/login",
+    status_code=status.HTTP_200_OK,
+    response_model=LoginResponse,
+    summary="Login user",
+    tags=["auth"],
+)
 async def authenticate_user(credentials: Credentials):
     with Session() as session:
         credentials_exception = HTTPException(
@@ -51,4 +66,4 @@ async def authenticate_user(credentials: Credentials):
         access_token = create_access_token(
             data={"sub": user.email}, expires_delta=timedelta(days=1)
         )
-        return {"access_token": access_token}
+        return LoginResponse(access_token=access_token)

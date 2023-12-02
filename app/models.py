@@ -17,6 +17,10 @@ class Profile(BaseModel):
     name: str
 
 
+class LoginResponse(BaseModel):
+    access_token: str
+
+
 class UserResponse(BaseModel):
     id: int
     name: str
@@ -43,11 +47,13 @@ class PollResponse(BaseModel):
     user_id: int
     options: list[OptionResponse]
 
+
 class VoteResponse(BaseModel):
     id: int
     user_id: int
     poll_id: int
     option_id: int
+
 
 class OptionCreateInput(BaseModel):
     title: str

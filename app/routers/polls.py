@@ -1,20 +1,25 @@
 from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from app.db import Session
 from app.dependencies import get_current_user
 from app.models import (OptionResponse, PollCreateInput, PollResponse,
                         PollUpdateInput)
-from app.schemas import Option, Poll, User, Vote
+from app.schemas import Option, Poll, User
 
 router = APIRouter()
 
 
 # TODO: add pagination
-@router.get("/polls", response_model=list[PollResponse])
+@router.get(
+    "/polls",
+    response_model=list[PollResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get all polls",
+    tags=["polls"],
+)
 async def get_polls(current_user: User = Depends(get_current_user)):
     with Session() as session:
         # TODO: add proper typing
@@ -48,7 +53,13 @@ async def get_polls(current_user: User = Depends(get_current_user)):
         return polls_response
 
 
-@router.get("/polls/{poll_id}", response_model=PollResponse)
+@router.get(
+    "/polls/{poll_id}",
+    response_model=PollResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get poll",
+    tags=["polls"],
+)
 async def get_poll(poll_id: int):
     with Session() as session:
         poll: Poll | None = session.query(Poll).filter_by(id=poll_id).first()
@@ -74,7 +85,13 @@ async def get_poll(poll_id: int):
         )
 
 
-@router.post("/polls", status_code=status.HTTP_201_CREATED, response_model=PollResponse)
+@router.post(
+    "/polls",
+    status_code=status.HTTP_201_CREATED,
+    response_model=PollResponse,
+    summary="Create poll",
+    tags=["polls"],
+)
 async def create_poll(
     poll: PollCreateInput, current_user: User = Depends(get_current_user)
 ):
@@ -113,7 +130,12 @@ async def create_poll(
         )
 
 
-@router.put("/polls/{poll_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put(
+    "/polls/{poll_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Update poll",
+    tags=["polls"],
+)
 async def update_poll(
     poll_id: int,
     poll_update: PollUpdateInput,
@@ -140,7 +162,12 @@ async def update_poll(
         return
 
 
-@router.delete("/polls/{poll_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/polls/{poll_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete poll",
+    tags=["polls"],
+)
 async def delete_poll(poll_id: int, current_user: User = Depends(get_current_user)):
     with Session() as session:
         poll: Poll | None = session.query(Poll).filter_by(id=poll_id).first()

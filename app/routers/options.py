@@ -1,17 +1,22 @@
 from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func
 
 from app.db import Session
 from app.dependencies import get_current_user
 from app.models import OptionCreateInput, OptionResponse, OptionUpdateInput
-from app.schemas import Option, Poll, User, Vote
+from app.schemas import Option, Poll, User
 
 router = APIRouter()
 
 
-@router.get("/polls/{poll_id}/options", response_model=list[OptionResponse])
+@router.get(
+    "/polls/{poll_id}/options",
+    response_model=list[OptionResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get poll options",
+    tags=["options"],
+)
 async def get_options(poll_id: int):
     with Session() as session:
         poll: Poll | None = session.query(Poll).filter_by(id=poll_id).first()
@@ -31,7 +36,13 @@ async def get_options(poll_id: int):
         return options_response
 
 
-@router.get("/polls/{poll_id}/options/{option_id}", response_model=OptionResponse)
+@router.get(
+    "/polls/{poll_id}/options/{option_id}",
+    response_model=OptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get poll option",
+    tags=["options"],
+)
 async def get_option(poll_id: int, option_id: int):
     with Session() as session:
         option: Option | None = session.query(Option).filter_by(id=option_id).first()
@@ -52,6 +63,8 @@ async def get_option(poll_id: int, option_id: int):
     "/polls/{poll_id}/options",
     status_code=status.HTTP_201_CREATED,
     response_model=OptionResponse,
+    summary="Create poll option",
+    tags=["options"],
 )
 async def create_option(
     poll_id: int,
@@ -84,7 +97,10 @@ async def create_option(
 
 
 @router.put(
-    "/polls/{poll_id}/options/{option_id}", status_code=status.HTTP_204_NO_CONTENT
+    "/polls/{poll_id}/options/{option_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Update poll option",
+    tags=["options"],
 )
 async def update_option(
     poll_id: int,
@@ -117,7 +133,10 @@ async def update_option(
 
 
 @router.delete(
-    "/polls/{poll_id}/options/{option_id}", status_code=status.HTTP_204_NO_CONTENT
+    "/polls/{poll_id}/options/{option_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete poll option",
+    tags=["options"],
 )
 async def delete_option(
     poll_id: int,

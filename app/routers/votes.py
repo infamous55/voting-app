@@ -16,6 +16,8 @@ router = APIRouter()
     "/polls/{poll_id}/options/{option_id}/vote",
     status_code=status.HTTP_201_CREATED,
     response_model=VoteResponse,
+    summary="Vote for poll option",
+    tags=["votes"],
 )
 async def vote(
     poll_id: int, option_id: int, current_user: User = Depends(get_current_user)
@@ -66,7 +68,10 @@ async def vote(
 
 
 @router.delete(
-    "/polls/{poll_id}/options/{option_id}/vote", status_code=status.HTTP_204_NO_CONTENT
+    "/polls/{poll_id}/options/{option_id}/vote",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete vote",
+    tags=["votes"],
 )
 async def delete_vote(
     poll_id: int, option_id: int, current_user: User = Depends(get_current_user)
