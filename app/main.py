@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.routers import votes
+
 from .db import init_db
 from .routers import auth, options, polls, users
 
@@ -18,6 +20,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(polls.router)
 app.include_router(options.router)
+app.include_router(votes.router)
 
 
 # the following functions are used for testing purposes
