@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from prometheus_fastapi_instrumentator import Instrumentator
 from app.routers import votes
 
 from .db import init_db
@@ -85,3 +85,5 @@ app.include_router(users.router)
 app.include_router(polls.router)
 app.include_router(options.router)
 app.include_router(votes.router)
+
+Instrumentator().instrument(app).expose(app)
